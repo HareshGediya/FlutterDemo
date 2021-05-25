@@ -3,9 +3,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_demo/models/post.dart';
 import 'package:flutter_demo/modules/posts/cubit/post_cubit.dart';
 import 'package:flutter_demo/routers/app_router.dart';
+import 'package:flutter_demo/utils/local_notification_manager.dart';
 
-class ProductPage extends StatelessWidget {
+class ProductPage extends StatefulWidget {
   const ProductPage({Key? key}) : super(key: key);
+
+  @override
+  _ProductPageState createState() => _ProductPageState();
+}
+
+class _ProductPageState extends State<ProductPage> {
+  @override
+  void initState() {
+    super.initState();
+
+    LocalNotificationManager.instance.onSelectNotification =
+        (String? payload) async {
+      print(payload);
+      await Navigator.of(context).pushNamed(AppRouter.productDetailRoute,
+          arguments: "From the notification");
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +58,10 @@ class ProductPage extends StatelessWidget {
       itemCount: posts.length,
       itemBuilder: (BuildContext context, int index) {
         return InkWell(
-          onTap: () {
-            Navigator.of(context).pushNamed(AppRouter.productDetailRoute,
-                arguments: "${index + 1}: ${posts[index].title}");
+          onTap: () async {
+            await LocalNotificationManager.instance.showNotification();
+            // Navigator.of(context).pushNamed(AppRouter.productDetailRoute,
+            //     arguments: "${index + 1}: ${posts[index].title}");
           },
           child: Container(
             padding: const EdgeInsets.all(5),
